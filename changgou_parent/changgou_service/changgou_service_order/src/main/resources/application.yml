@@ -1,0 +1,43 @@
+server:
+  port: 18091
+spring:
+  application:
+    name: order
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.112.138:3306/changgou_order?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: 123456
+  redis:
+    host: 192.168.112.138
+    port: 6379
+  main:
+    allow-bean-definition-overriding: true
+  # Rabbitmq 基本配置
+  rabbitmq:
+    host: 192.168.112.138
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:7001/eureka
+  instance:
+    prefer-ip-address: true
+feign:
+  hystrix:
+    enabled: true
+
+#位置支付交换机和队列
+mq:
+  pay:
+    # 交换机
+    exchange:
+      order: exchange.order
+    # 队列
+    queue:
+      order: queue.order
+    # 路由
+    routing:
+      key: queue.order

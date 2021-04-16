@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<!--引入thymeleaf标签, xmlns XML 命名空间-->
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>thymeleaf-Test</title>
+</head>
+<body>
+    hello
+    <p th:text="${msg}"></p>
+<form id="login-form" th:action="@{/test/1}">
+    <button>提交</button>
+</form>
+
+<table>
+    <tr>
+        <td>下标</td>
+        <td>编号</td>
+        <td>姓名</td>
+        <td>住址</td>
+    </tr>
+<!--    遍历对象-->
+    <tr th:each="user, userSta:${users}">
+        <td>下标:<span th:text="${userSta.index}"></span></td>
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.address}"></td>
+    </tr>
+
+    <div>
+        <h1>Map获取数据</h1>
+        <div>
+            <span th:text="${dataMap.No}"></span><br/>
+            <span th:text="${dataMap.address}"></span><br/>
+        </div>
+
+        <div th:each="map:${dataMap}">
+            <span th:text="${map.key}"></span>:
+            <span th:text="${map.value}"></span>
+        </div>
+    </div>
+</table>
+</body>
+</html>

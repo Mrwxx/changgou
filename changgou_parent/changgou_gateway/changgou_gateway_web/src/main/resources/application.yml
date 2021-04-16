@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: gateway-web
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]': # 匹配所有请求
+            allowedOrigins: "*" #跨域处理 允许所有的域
+            allowedMethods: # 支持的方法
+              - GET
+              - POST
+              - PUT
+              - DELETE
+      routes:
+        - id: changgou_goods_route    #商品微服务路由的唯一ID
+          #uri: http://localhost:18081 #路由访问的微服务地址
+          uri: lb://goods   #负载均衡访问微服务，在微服务集群中使用，根据微服务名称
+          predicates:     # 路由规则断言
+            #- Host=cloud.itheima.com**   #访问网关的域名规则，这里是以cloud.itheima.com为域名都可以访问uri
+            #域名后面的路径规则，这里意思是只要访问的路径如下所示，就都可以进行网关路由
+            - Path=/api/goods/**,/api/album/**,/api/brand/**,/api/cache/**,/api/categoryBrand/**,/api/category/**,/api/para/**,/api/pref/**,/api/sku/**,/api/spec/**,/api/spu/**,/api/stockBack/**,/api/template/**
+          filters:      #过滤器规则
+          - StripPrefix=1   #去掉路径中的第一段地址，以/划分
+          #- PrefixPath=/brand  #在路径前面加上前缀
+          - name: RequestRateLimiter   #请求数限流，名称不能随便写，使用默认的Factory
+            args:
+              key-resolver: "#{@ipKeyResolver}"   #key
+              redis-rate-limiter.replenishRate: 2  #令牌桶1秒填充速率
+              redis-rate-limiter.burstCapacity: 2  # 并发1秒最大速率
+        - id: changgou_user_route    #用户微服务路由的唯一ID
+          uri: lb://user   #负载均衡访问微服务，在微服务集群中使用，根据微服务名称
+          predicates:     # 路由规则断言
+            #- Host=cloud.itheima.com**   #访问网关的域名规则，这里是以cloud.itheima.com为域名都可以访问uri
+            #路径过滤，即只要访问以下的微服务地址，都会路由到user微服务中
+            - Path=/api/user/**,/api/address/**,/api/areas/**,/api/cities/**,/api/provinces/**    #域名后面的路径规则，这里是所有路径
+          filters:      #过滤器规则
+          - StripPrefix=1   #去掉路径中的第一段地址，以/划分
+        - id: changgou_order_route    #用户微服务路由的唯一ID
+          uri: lb://order   #负载均衡访问微服务，在微服务集群中使用，根据微服务名称
+          predicates:     # 路由规则断言
+            #- Host=cloud.itheima.com**   #访问网关的域名规则，这里是以cloud.itheima.com为域名都可以访问uri
+            #路径过滤，即只要访问以下的微服务地址，都会路由到order微服务中
+            - Path=/api/cart/**,/api/categoryReport/**,/api/orderConfig/**,/api/order/**,/api/orderItem/**,/api/orderLog/**,/api/preferential/**,/api/returnCause/**,/api/returnOrder/**,/api/returnOrderItem/**    #域名后面的路径规则，这里是所有路径
+          filters:      #过滤器规则
+            - StripPrefix=1   #去掉路径中的第一段地址，以/划分
+  redis:
+    host: 192.168.112.138
+    port: 6379
+server:
+  port: 8001
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:7001/eureka
+  instance:
+    prefer-ip-address: true
+management:
+  endpoint:
+    gateway:
+      enabled: true
+    web:
+      exposure:
+        include: true
